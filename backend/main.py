@@ -1,14 +1,11 @@
 import requests
 
 API_KEY = "AIzaSyAZNVwPsGBCUTejpyMNLz-lR4pLbMU9Abg"
-HEADERS = {
-    "x-api-key": API_KEY
-}
-
+HEADERS = {"x-api-key": API_KEY}
 BASE_URL = "https://api.utdnebula.com"
 
-def search_course(course_prefix, course_number):
-    response = requests.get(f"{BASE_URL}/course/sections", params={"course_number": course_number, "subject_prefix": course_prefix}, headers=HEADERS)
+def search_course(course_prefix, course_number, page = 0):
+    response = requests.get(f"{BASE_URL}/course/sections", params={"course_number": course_number, "subject_prefix": course_prefix,  "former_offset": page}, headers=HEADERS)
     response.raise_for_status()
     results = response.json()
     return results
@@ -28,8 +25,9 @@ def get_grade_distribution(course_prefix, course_number, prof_firstname, prof_la
 def main():
     course_prefix = input("Enter course prefix (e.g., CS): ").strip().upper()
     course_number = input("Enter course number (e.g., 1337): ").strip()
+    page = input("Enter page number: ").strip()
 
-    course = search_course(course_prefix, course_number)
+    course = search_course(course_prefix, course_number, page)
     if not course:
         print("Course not found.")
         return
@@ -51,17 +49,18 @@ def main():
     for prof in range(len(prof_firstnames)):
         grades.append(get_grade_distribution(course_prefix, course_number, prof_firstnames[prof], prof_lastnames[prof]))
     grade_distribution = [item['data'] for item in grades if 'data' in item]
-    #print(course)
+    print(course)
 
     info = []
     for i in range(len(section_number)):
         info.append([f"{course_prefix} {course_number}.{section_number[i]}: ",
-        f"Start date: {start_dates[i]}"
+        f"Start date: {start_dates[i]}",
         f"Professor: {prof_firstnames[i]} {prof_lastnames[i]}",
         f"TA: {teaching_assistants[i] if teaching_assistants[i] else "None"}",
         f"{grade_distribution[i]}"])
+        #print(info[i])
     
-    print(info)
+    #print(info)
 
 if __name__ == "__main__":
     main()

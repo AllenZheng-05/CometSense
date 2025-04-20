@@ -39,7 +39,7 @@ def get_data():
         return jsonify({"error": "Missing prefix or number"}), 400
 
     try:
-        course = search_course(course_prefix, course_number, 7)
+        course = search_course(course_prefix, course_number)
         course_ids = [section['course_reference'] for section in course['data']]
         instructors = [section['professors'] for section in course['data']]
         professors = [get_professor(prof[0]) for prof in instructors]
