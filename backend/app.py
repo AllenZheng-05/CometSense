@@ -49,6 +49,7 @@ def get_data():
 
         grades = [get_grade_distribution(course_prefix, course_number, prof_firstnames[i], prof_lastnames[i]) for i in range(len(prof_firstnames))]
         grade_distribution = [item['data'] for item in grades if 'data' in item]
+        start_dates = [section['start_date'] for section in course['data']]
 
         info = []
         for i in range(len(section_number)):
@@ -56,6 +57,7 @@ def get_data():
                 f"{course_prefix} {course_number}.{section_number[i]}: ",
                 f"Professor: {prof_firstnames[i]} {prof_lastnames[i]}",
                 f"TA: {teaching_assistants[i] if teaching_assistants[i] else 'None'}",
+                f"Start date: {start_dates[i]}",
                 f"{grade_distribution[i]}"
             ])
             print(info[i])
