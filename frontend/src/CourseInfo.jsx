@@ -41,10 +41,10 @@ const App = () => {
   const toGradeObject = (grades) => {
     const gradeObj = {};
     gradeKeys.forEach((key, index) => {
-      gradeObj[key] = grades[index] || 0;
+      gradeObj[key] = grades[index] ?? 0;
     });
     return gradeObj;
-  };
+  };  
 
   return (
     <div
@@ -65,7 +65,7 @@ const App = () => {
           padding: "2rem",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center"
+          justifyContent: "center",
         }}
       >
         <h1
@@ -74,6 +74,7 @@ const App = () => {
             fontWeight: "bold",
             marginBottom: "1rem",
             color: "#228B22",
+            textAlign: "center",
           }}
         >
           CometSense
@@ -116,48 +117,56 @@ const App = () => {
         >
           Search
         </button>
+        
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column-reverse",
+          }}
+        >
+          {Array.isArray(data) ? (
+            data.map((entry, i) => {
+              const [course, professor, ta, startDate, gradeArray] = entry;
+              const gradeData = Object.entries(toGradeObject(gradeArray)).map(
+                ([grade, count]) => ({
+                  grade,
+                  count,
+                })
+              );
 
-        {Array.isArray(data) ? (
-          data.map((entry, i) => {
-            const [course, professor, ta, startDate, gradeArray] = entry;
-            const gradeData = Object.entries(toGradeObject(gradeArray)).map(
-              ([grade, count]) => ({
-                grade,
-                count,
-              })
-            );
+              return (
+                <div
+                  key={i}
+                  style={{
+                    backgroundColor: "#fff",
+                    marginTop: "1rem",
+                    padding: "1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  <div style={{ marginBottom: "0.5rem" }}>{course}</div>
+                  <div style={{ marginBottom: "0.5rem" }}>{professor}</div>
+                  <div style={{ marginBottom: "0.5rem" }}>{ta}</div>
+                  <div style={{ marginBottom: "1rem" }}>{startDate}</div>
 
-            return (
-              <div
-                key={i}
-                style={{
-                  backgroundColor: "#fff",
-                  marginTop: "1rem",
-                  padding: "1rem",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                }}
-              >
-                <div style={{ marginBottom: "0.5rem" }}>{course}</div>
-                <div style={{ marginBottom: "0.5rem" }}>{professor}</div>
-                <div style={{ marginBottom: "0.5rem" }}>{ta}</div>
-                <div style={{ marginBottom: "1rem" }}>{startDate}</div>
-
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={gradeData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="grade" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#cd853f" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            );
-          })
-        ) : (
-          <div style={{ marginTop: "1rem", color: "#b22222" }}>{data}</div>
-        )}
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={gradeData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="grade" />
+                      <YAxis allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#cd853f" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              );
+            })
+          ) : (
+            <div style={{ marginTop: "1rem", color: "#b22222" }}>{data}</div>
+          )}
+        </div>
+          
       </div>
     </div>
   );

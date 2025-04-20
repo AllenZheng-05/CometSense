@@ -1,6 +1,5 @@
 import requests
-from flask import request
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -10,8 +9,11 @@ API_KEY = "AIzaSyAZNVwPsGBCUTejpyMNLz-lR4pLbMU9Abg"
 HEADERS = {"x-api-key": API_KEY}
 BASE_URL = "https://api.utdnebula.com"
 
-def search_course(course_prefix, course_number):
-    response = requests.get(f"{BASE_URL}/course/sections", params={"course_number": course_number, "subject_prefix": course_prefix}, headers=HEADERS)
+def search_course(course_prefix, course_number, page = 0):
+    response = requests.get(
+        f"{BASE_URL}/course/sections", 
+        params={"course_number": course_number, "subject_prefix": course_prefix, "former_offset": page}, 
+        headers=HEADERS)
     response.raise_for_status()
     results = response.json()
     return results
@@ -22,8 +24,8 @@ def get_professor(prof_id):
     results = response.json()
     return results
 
-def get_grade_distribution(course_prefix, course_number, prof_firstname, prof_lastname):
-    response = requests.get(f"{BASE_URL}/grades/overall", params={"number": course_number, "prefix": course_prefix, "first_name": prof_firstname, "last_name": prof_lastname}, headers=HEADERS)
+def get_grade_distribution(course_prefix, course_number, prof_firstname, prof_lastname, section_number):
+    response = requests.get(f"{BASE_URL}/grades/overall", params={"number": course_number, "prefix": course_prefix, "first_name": prof_firstname, "last_name": prof_lastname, "section_number": section_number}, headers=HEADERS)
     response.raise_for_status()
     results = response.json()
     return results
@@ -37,7 +39,7 @@ def get_data():
         return jsonify({"error": "Missing prefix or number"}), 400
 
     try:
-        course = search_course(course_prefix, course_number)
+        course = search_course(course_prefix, course_number, 7)
         course_ids = [section['course_reference'] for section in course['data']]
         instructors = [section['professors'] for section in course['data']]
         professors = [get_professor(prof[0]) for prof in instructors]
@@ -47,10 +49,10 @@ def get_data():
         teaching_assistants = [section['teaching_assistants'] for section in course['data']]
         section_number = [section['section_number'] for section in course['data']]
 
-        grades = [get_grade_distribution(course_prefix, course_number, prof_firstnames[i], prof_lastnames[i]) for i in range(len(prof_firstnames))]
+        grades = [get_grade_distribution(course_prefix, course_number, prof_firstnames[i], prof_lastnames[i], section_number[i]) for i in range(len(prof_firstnames))]
         grade_distribution = [item['data'] for item in grades if 'data' in item]
         start_dates = [section['academic_session']['start_date'] for section in course['data']]
-        print(course['data'][0])  # to inspect one section
+        #print(course['data'][0])  # to inspect one section
 
 
         info = []
