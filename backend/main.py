@@ -36,7 +36,7 @@ def main():
 
     course_ids = [section['course_reference'] for section in course['data']]
     instructors = [section['professors'] for section in course['data']]
-    start_date = [section['start_date'] for section in course['data']]
+    start_dates = [section['academic_session']['start_date'] for section in course['data']]
     professors = []
     for prof in instructors:
         professors.append(get_professor(prof[0]))
@@ -51,14 +51,17 @@ def main():
     for prof in range(len(prof_firstnames)):
         grades.append(get_grade_distribution(course_prefix, course_number, prof_firstnames[prof], prof_lastnames[prof]))
     grade_distribution = [item['data'] for item in grades if 'data' in item]
+    #print(course)
 
     info = []
     for i in range(len(section_number)):
-        info[i].append([f"{course_prefix} {course_number}.{section_number[i]}: ",
-        f"Start date: {start_date[i]}"
+        info.append([f"{course_prefix} {course_number}.{section_number[i]}: ",
+        f"Start date: {start_dates[i]}"
         f"Professor: {prof_firstnames[i]} {prof_lastnames[i]}",
         f"TA: {teaching_assistants[i] if teaching_assistants[i] else "None"}",
         f"{grade_distribution[i]}"])
+    
+    print(info)
 
 if __name__ == "__main__":
     main()
