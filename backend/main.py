@@ -26,16 +26,17 @@ def get_grade_distribution(course_prefix, course_number, prof_firstname, prof_la
     return results
 
 def main():
-    course_prefix = input("Enter course prefix (e.g., CS): ").strip()
+    course_prefix = input("Enter course prefix (e.g., CS): ").strip().upper()
     course_number = input("Enter course number (e.g., 1337): ").strip()
+
     course = search_course(course_prefix, course_number)
-    
     if not course:
         print("Course not found.")
         return
 
     course_ids = [section['course_reference'] for section in course['data']]
     instructors = [section['professors'] for section in course['data']]
+    start_date = [section['start_date'] for section in course['data']]
     professors = []
     for prof in instructors:
         professors.append(get_professor(prof[0]))
@@ -49,7 +50,15 @@ def main():
     grades = []
     for prof in range(len(prof_firstnames)):
         grades.append(get_grade_distribution(course_prefix, course_number, prof_firstnames[prof], prof_lastnames[prof]))
+    grade_distribution = [item['data'] for item in grades if 'data' in item]
 
+    info = []
+    for i in range(len(section_number)):
+        info[i].append([f"{course_prefix} {course_number}.{section_number[i]}: ",
+        f"Start date: {start_date[i]}"
+        f"Professor: {prof_firstnames[i]} {prof_lastnames[i]}",
+        f"TA: {teaching_assistants[i] if teaching_assistants[i] else "None"}",
+        f"{grade_distribution[i]}"])
 
 if __name__ == "__main__":
     main()
